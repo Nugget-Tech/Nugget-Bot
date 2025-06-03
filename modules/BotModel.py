@@ -256,7 +256,34 @@ class BotModel:
 
             response = emoji.text or emoji.candidates[0]
             # context_window[channel_id].append(f"You reacted with this emoji {response}")
-            return response
+
+    async def generate_reaction(channel_id, attachment=None):
+
+        if attachment:
+            # do some file uploadry and something idk yet thats a TODO
+            pass
+
+        prompt = f"""You are in an embedded LLM, 
+        you must only respond with ONE character, 
+        an emoji, using this emoji react to the conversation going on, 
+        if its good, if its bad, in one emoji. - \n\n The conversation [PARTIAL] is as follows {"\n".join(context_window[channel_id])}"""
+        response: GenerateContentResponse = await client.aio.models.generate_content(
+            model="gemini-2.0-flash", contents=prompt
+        )
+
+        why_prompt = f"""You are in an embedded LLM, 
+        you must only respond with a concise, 
+        bias free message, in this context you have just reacted to the users message 
+        ({"\n".join(context_window[channel_id])}) with {response.text.strip()}, 
+        using the data available you must now come up with the reason why you did what you did"""
+
+        why_response: GenerateContentResponse = (
+            await client.aio.models.generate_content(
+                contents=why_prompt, model=CommonCalls.config()["aiModel"]
+            )
+        )
+
+        # join this to the context window
 
     async def speech_to_text(audio_file: File):
         """

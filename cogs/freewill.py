@@ -38,6 +38,9 @@ class Freewill(commands.Cog):
                 return
 
             text_frequency = float(CommonCalls.config().get("textFrequency", 0)) * 0.01
+            reaction_frequency = (
+                float(CommonCalls.config().get("reactionFrequency", 0)) * 0.01
+            )
             keywords = CommonCalls.config().get("keywords", [])
             keyword_added_chance = 0
 
@@ -82,13 +85,15 @@ class Freewill(commands.Cog):
                     except Exception as E:
                         print(f"Error replying response: {E}")
 
-            # if random.random() < min(reaction_frequency + keyword_added_chance, 1.0):
-            #     response = await Gemini.generate_response(message)
+            if random.random() < min(reaction_frequency + keyword_added_chance, 1.0):
+                response = await Gemini.generate_response(message)
 
-            #     async with message.channel.typing():
-            #         await asyncio.sleep(2) # artificial delay lol
+                async with message.channel.typing():
+                    await asyncio.sleep(2)  # artificial delay lol
 
-            #     await ctx.reply(response, mention_author=False, allowed_mentions=allowed_mentions)
+                await ctx.reply(
+                    response, mention_author=False, allowed_mentions=allowed_mentions
+                )
 
 
 def setup(bot: commands.Bot):
