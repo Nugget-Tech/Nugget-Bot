@@ -42,9 +42,9 @@ sample_config = {
     "textFrequency": "0",
     "keywordChance": "0",
     "keywords": [],
-    "voice_messages": "on",
-    "voice_messages_initiate_on_voice_message": "on",
-    "voice_chance": "100",
+    "voiceMessages": "on",
+    "voiceMessageConvo": "on",
+    "voiceChance": "100",
 }
 
 sample_personality = {

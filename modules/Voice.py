@@ -35,7 +35,11 @@ class VoiceCalls:
         voice_client: discord.VoiceClient, text, voice="Antoni"
     ):
         # Generate audio
-        _audio = client.generate(text=text, voice=voice, model="eleven_multilingual_v2")
+        _audio = client.generate(
+            text=text,
+            voice=CommonCalls.config().get("voiceId"),
+            model=CommonCalls.config().get("voiceModel"),
+        )
 
         audio = stream(_audio)
 
@@ -142,9 +146,13 @@ class VoiceCalls:
 
 class VoiceMessages:
     @staticmethod
-    async def record_with_elevenlabs(text, save_file, voice="Antoni"):
+    async def record_with_elevenlabs(text, save_file):
         # Generate audio using ElevenLabs SDK
-        audio = client.generate(text=text, voice=voice, model="eleven_multilingual_v2")
+        audio = client.generate(
+            text=text,
+            voice=CommonCalls.config().get("voiceId"),
+            model=CommonCalls.config().get("voiceModel"),
+        )
         save_path = f"./bot_audio/{save_file}"
 
         # Save the audio to an MP3 file

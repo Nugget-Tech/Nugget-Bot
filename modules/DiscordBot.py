@@ -32,11 +32,11 @@ class Gemini:
         message_id = ctx.message.id  # declare message id
         attachments = ctx.message.attachments  # declare message attachments
         config = CommonCalls.config()
-        voice_mode_trigger_chance = config["voice_chance"]
+        voice_mode_trigger_chance = config["voiceChance"]
         voice_response = False
         if (
             random.random() < float(voice_mode_trigger_chance)
-            and config["voice_messages"] == "on"
+            and config["voiceMessages"] == "on"
         ):
             voice_response = True
 
@@ -168,8 +168,7 @@ class Gemini:
             )
 
             if (
-                config["voice_messages"] == "on"
-                and config["voice_messages_initiate_on_voice_message"] == "on"
+                config["voiceMessages"] == "on" and config["voiceMessageConvo"] == "on"
             ):  # TODO change the name of that
                 # this means the global setting voice messages is on and the user would like to do voice message to voice message
                 # so lets implement this now, lets first start off by generalizing voice call.py
