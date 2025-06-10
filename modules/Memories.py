@@ -10,6 +10,7 @@ from google.genai.types import (
 from discord import Message
 from modules.ManagedMessages import ManagedMessages
 from modules.CommonCalls import CommonCalls
+from uuid import uuid4
 
 context_window = ManagedMessages.context_window
 
@@ -32,7 +33,7 @@ class Memories:
         prompt = f"You're a data analyst who's only purpose is to summarize large but concise summaries on text provided to you, try to retain most of the information! Your first task is to summarize this conversation from the perspective of {self.character_name} --- Conversation Start ---\n{'\n'.join(context_window[channel_id])} --- Conversation End ---"
 
         response: GenerateContentResponse = await client.aio.models.generate_content(
-            prompt,
+            contents=prompt,
             model=CommonCalls.config()["aiModel"],
             config=GenerateContentConfig(
                 safety_settings=[
@@ -75,26 +76,42 @@ class Memories:
         print(
             "Save to memory function call `Memories.save_to_memory` (Message from line 98 @ modules/Memories.py)"
         )
-        channel_id = message.channel.id
-        key = str(channel_id)  # Ensure key consistency
+        _channel_id = message.channel.id
+        guild_id = message.guild.id
+        key = str(guild_id)  # Ensure key consistency
 
         # Load the current memories from the JSON file
         memories = self.load_memories()
 
-        if force or len(context_window[channel_id]) == int(
+        if force or len(context_window[_channel_id]) == int(
             CommonCalls.config()["maxContext"]
         ):
-            summary_of_context_window = await self.summarize_context_window(channel_id)
+            summary_of_context_window = await self.summarize_context_window(
+                _channel_id
+            )  # for its contextwindow call
             special_phrase = (
                 await self.is_worth_remembering(
-                    context="\n".join(context_window[channel_id])
+                    context="\n".join(context_window[_channel_id])
                 )
             )["special_phrase"]
-            memory_entry = {
-                "special_phrase": special_phrase,
-                "memory": summary_of_context_window,
-                "timestamp": message.created_at.isoformat(),
-            }
+            if special_phrase == None or special_phrase == "":
+                print(
+                    f"[Warning] modules/Memories.py `save_to_memory` force_level = {force}. Special phrase is none. a uuid is being assigned."
+                )
+
+                memory_entry = {
+                    "memory_id": str(uuid4()),
+                    "special_phrase": str(uuid4()),
+                    "memory": summary_of_context_window,
+                    "timestamp": message.created_at.isoformat(),
+                }
+            else:
+                memory_entry = {
+                    "memory_id": str(uuid4()),
+                    "special_phrase": special_phrase,
+                    "memory": summary_of_context_window,
+                    "timestamp": message.created_at.isoformat(),
+                }
 
             # Append to the existing memories
             memories[key] = memories.get(key, []) + [memory_entry]
@@ -103,19 +120,22 @@ class Memories:
             self.save_memories(memories)
 
             print(
-                f"Saved message: {message.content}\nTo memory: {summary_of_context_window}\nFor: {channel_id}"
+                f"Saved message: {special_phrase}\nTo memory: {summary_of_context_window}\nFor: {guild_id}"
             )
 
-    def fetch_and_sort_entries(self, channel_id):
+    def fetch_and_sort_entries(self, guild_id):
         # Load the current memories from the JSON file
         memories = self.load_memories()
-        key = str(channel_id)  # Ensure key consistency
+        print("fetch n sort pre sort: ", memories.keys())
+        key = str(guild_id)  # Ensure key consistency
 
         # Get the memories for the specific channel, sorted by timestamp
         sorted_memories = sorted(memories.get(key, []), key=lambda x: x["timestamp"])
+        print("fetch n sort post sort: ", memories.keys())
 
         # Create a dictionary with special_phrase as the key and memory as the value
         result = {entry["special_phrase"]: entry["memory"] for entry in sorted_memories}
+        print("fetch n sort emitted result: ", result)
         return result
 
     async def is_worth_remembering(self, context):
@@ -147,7 +167,7 @@ Provide your response in a JSON format {"is_worth" : true/false, "special_phrase
         try:
             unloaded_json: GenerateContentResponse = (
                 await client.aio.models.generate_content(
-                    context,
+                    contents=context,
                     model=CommonCalls.config()["aiModel"],
                     config=GenerateContentConfig(
                         safety_settings=[
@@ -180,11 +200,12 @@ Provide your response in a JSON format {"is_worth" : true/false, "special_phrase
         except Exception as E:
             print(E)
 
-    async def compare_memories(self, channel_id, message):
+    async def compare_memories(self, guild_id, channel_id, message):
         print(
             "Compare Memories function call `Memories.compare_memories` (Message from line 202 @ modules/Memories.py)"
         )
-        entries = self.fetch_and_sort_entries(channel_id).keys()
+        entries = self.fetch_and_sort_entries(guild_id).keys()
+        print("This is entries from compare memories in modules/memories.py", entries)
         system_instruction = """
 Objective:
 Determine if the provided context or phrase is similar to another given phrase or message based on predefined criteria.
@@ -247,7 +268,7 @@ List of phrases: {", ".join(entries)}
                 ),
             )
             clean_json = json.loads(self.clean_json(unloaded_json.text))
-
+            # print(clean_json)
             return clean_json
         except Exception as E:
             print(E)
@@ -282,5 +303,6 @@ List of phrases: {", ".join(entries)}
 
     def save_memories(self, memories):
         serializable_memories = self.convert_to_serializable(memories)
+        print(serializable_memories)
         with open(MEMORIES_FILE, "w") as file:
             json.dump(serializable_memories, file, indent=4)

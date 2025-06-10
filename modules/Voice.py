@@ -75,7 +75,10 @@ class VoiceCalls:
             stt = await BotModel.speech_to_text(audio_file=file)  # Converts to text +1
 
             response = await headless_Gemini.generate_response(
-                channel_id=channel.id, author_name=author_name, author_content=stt
+                guild_id=channel.guild.id,
+                channel_id=channel.id,
+                author_name=author_name,
+                author_content=stt,
             )
 
             await VoiceCalls.say_with_elevenlabs(
@@ -141,7 +144,14 @@ class VoiceCalls:
         None
         """
 
-    # TODO Add this lol
+        voice: discord.Member.voice = ctx.author.voice
+
+        if not voice:
+            await ctx.send("You aren't in a voice channel!")
+            return
+
+        else:
+            await ctx.voice_client.disconnect()
 
 
 class VoiceMessages:

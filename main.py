@@ -16,7 +16,7 @@ mem_path = f"data/{CommonCalls.config()['alias']}-memories.json"
 act_path = f"data/{CommonCalls.config()['alias']}-activation.json"
 
 
-@bot.listen("on_ready")
+@bot.listen("on_ready", once=True)
 async def load_cogs():
     for ext in os.listdir("cogs"):
         if ext.endswith(".py"):

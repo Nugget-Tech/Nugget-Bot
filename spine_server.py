@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import JSONResponse
 from discord.ext import commands
 import json
 import os
@@ -7,9 +8,13 @@ import os
 def create_app(bot: commands.Bot):
     app = FastAPI()
 
+    @app.get("/logs")
+    async def cmdline_view():
+        raise NotImplementedError
+
     @app.get("/health")
     async def health():
-        return {"status": "ok"}
+        return {"status": "ok"}  # Make this more descriptive
 
     @app.post("/event")
     async def event_trigger(request: Request):
@@ -68,8 +73,88 @@ def create_app(bot: commands.Bot):
                     json.dump(existing_personality, f, indent=4)
                 return {"status": "personality updated"}
 
+            case "update_memory":
+                memory = data.get("memory")
+                print("[SPINE SERVER] [CRITICAL] | Analyzing memory")
+
+                # The memory data should be a dict with guild_id as key
+                if not isinstance(memory, dict) or len(memory) != 1:
+                    return {"status": "error", "message": "Invalid memory format"}
+
+                # Get the guild_id (key) and memories (value) from the incoming data
+                guild_id = next(iter(memory.keys()))
+                new_memories = memory[guild_id]
+
+                if not isinstance(new_memories, list) or not new_memories:
+                    return {"status": "error", "message": "Invalid memories format"}
+
+                print(f"[SPINE SERVER] [CRITICAL] | Guild ID: {guild_id}")
+                print(f"Type: {type(memory)}")
+                print(memory)
+                print("updating memory keys... please hold")
+                memories_path = f"data/{os.getenv('BOT_ID')}-memories.json"
+
+                # Read existing memories
+                existing_memories = {}
+                if os.path.exists(memories_path):
+                    try:
+                        with open(memories_path, "r") as f:
+                            existing_memories = json.load(f)
+                    except json.JSONDecodeError:
+                        print(
+                            "[SPINE SERVER] [WARNING] | Existing memory file is invalid JSON"
+                        )
+
+                # Initialize guild array if it doesn't exist
+                if guild_id not in existing_memories:
+                    existing_memories[guild_id] = []
+
+                # For each new memory in the array
+                for new_memory in new_memories:
+                    memory_id = new_memory.get("memory_id")
+                    if not memory_id:
+                        continue  # Skip memories without memory_id
+
+                    # Find and update existing memory or append new one
+                    memory_updated = False
+                    for i, existing_memory in enumerate(existing_memories[guild_id]):
+                        if existing_memory.get("memory_id") == memory_id:
+                            existing_memories[guild_id][i] = new_memory
+                            memory_updated = True
+                            break
+
+                    if not memory_updated:
+                        existing_memories[guild_id].append(new_memory)
+
+                # Save updated memories
+                with open(memories_path, "w") as f:
+                    json.dump(existing_memories, f, indent=4)
+
+                return {"status": "memory updated"}
+
             case _:
                 return {"status": "unknown event"}
+
+    @app.get("/memories")
+    def memory_ret():
+        memory_path = f"./data/{os.getenv('BOT_ID')}-memories.json"
+        with open(memory_path, "r") as memories:
+            loaded_memories = json.load(memories)
+            return JSONResponse(loaded_memories)
+
+    @app.post("/memories")
+    def memory_set():
+        memory_path = f"./data/{os.getenv('BOT_ID')}-memories.json"
+        with open(memory_path, "r") as memories:
+            loaded_memories = json.load(memories)
+            return JSONResponse(loaded_memories)
+
+    @app.get("/guilds")
+    def guilds_ret():
+        guilds = []
+        for guild in bot.guilds:
+            guilds.append({"id": guild.id, "name": guild.name, "icon": guild.icon.key})
+        return JSONResponse(guilds)
 
     return app
 

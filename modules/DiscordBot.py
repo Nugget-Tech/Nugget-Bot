@@ -5,7 +5,7 @@ This is the API for discord interactions.
 import os
 import random
 
-from discord import Message
+from discord import Message, TextChannel, VoiceChannel
 from discord.ext import commands
 from discord.file import VoiceMessage
 from modules.Memories import Memories
@@ -26,9 +26,8 @@ class Gemini:
         """Accepts discord.Message object and auto-handles everything"""
 
         message = ctx.message
-        channel_id = (
-            ctx.message.channel.id
-        )  # declare channel id (channel id is unique for context window)
+        guild_id = ctx.guild.id
+        channel_id = ctx.message.channel.id  # declare channel id for the context window
         message_id = ctx.message.id  # declare message id
         attachments = ctx.message.attachments  # declare message attachments
         config = CommonCalls.config()
@@ -54,13 +53,13 @@ class Gemini:
         # auto manages context window size
 
         remembered_memories = await memories.compare_memories(
-            channel_id, message.content
+            guild_id, channel_id, message.content
         )
 
         if remembered_memories["is_similar"]:
             prompt = read_prompt(
                 message,
-                memories.fetch_and_sort_entries(channel_id).get(
+                memories.fetch_and_sort_entries(guild_id).get(
                     remembered_memories.get("similar_phrase")
                 ),
             )
@@ -203,7 +202,7 @@ class Gemini:
 
 class headless_Gemini:
 
-    async def generate_response(channel_id, author_name, author_content):
+    async def generate_response(guild_id, channel_id, author_name, author_content):
 
         if channel_id not in context_window:
             context_window[channel_id] = (
@@ -215,7 +214,7 @@ class headless_Gemini:
         )
 
         remembered_memories = await memories.compare_memories(
-            channel_id, author_content
+            guild_id, channel_id, author_content
         )
 
         if remembered_memories["is_similar"]:
