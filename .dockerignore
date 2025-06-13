@@ -2,3 +2,9 @@ __pycache__/
 *.pyc
 .env
 data/*
+docker-build
+Dockerfile
+LICENSE
+README.md
+.gitignore
+bot_audio/*

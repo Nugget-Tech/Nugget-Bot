@@ -76,6 +76,8 @@ def create_app(bot: commands.Bot):
             case "update_memory":
                 memory = data.get("memory")
                 print("[SPINE SERVER] [CRITICAL] | Analyzing memory")
+                print("data:", data)
+                print("memory:", memory)
 
                 # The memory data should be a dict with guild_id as key
                 if not isinstance(memory, dict) or len(memory) != 1:
@@ -84,6 +86,7 @@ def create_app(bot: commands.Bot):
                 # Get the guild_id (key) and memories (value) from the incoming data
                 guild_id = next(iter(memory.keys()))
                 new_memories = memory[guild_id]
+                print(new_memories)
 
                 if not isinstance(new_memories, list) or not new_memories:
                     return {"status": "error", "message": "Invalid memories format"}
@@ -132,6 +135,72 @@ def create_app(bot: commands.Bot):
 
                 return {"status": "memory updated"}
 
+            case "delete_memory":
+                memory = data.get("memory")
+                print("[SPINE SERVER] [CRITICAL] | Analyzing memory deletion request")
+                print("data:", data)
+                print("memory:", memory)
+
+                # The memory data should be a dict with guild_id as key
+                if not isinstance(memory, dict) or len(memory) != 1:
+                    return {"status": "error", "message": "Invalid memory format"}
+
+                # Get the guild_id (key) and memories (value) from the incoming data
+                guild_id = next(iter(memory.keys()))
+                memories_to_delete = memory[guild_id]
+
+                if not isinstance(memories_to_delete, list) or not memories_to_delete:
+                    return {"status": "error", "message": "Invalid memories format"}
+
+                print(f"[SPINE SERVER] [CRITICAL] | Guild ID: {guild_id}")
+                memories_path = f"data/{os.getenv('BOT_ID')}-memories.json"
+
+                # Read existing memories
+                existing_memories = {}
+                if os.path.exists(memories_path):
+                    try:
+                        with open(memories_path, "r") as f:
+                            existing_memories = json.load(f)
+                    except json.JSONDecodeError:
+                        print(
+                            "[SPINE SERVER] [WARNING] | Existing memory file is invalid JSON"
+                        )
+                        return {
+                            "status": "error",
+                            "message": "Failed to read memories file",
+                        }
+
+                if guild_id not in existing_memories:
+                    print("[SPINE SERVER] [WARNING] | Guild ID is not registered.")
+                    return {"status": "error", "message": "Guild not found in memories"}
+
+                # Get the memory IDs to delete
+                memory_ids_to_delete = [
+                    m.get("memory_id") for m in memories_to_delete if m.get("memory_id")
+                ]
+                if not memory_ids_to_delete:
+                    return {
+                        "status": "error",
+                        "message": "No valid memory IDs provided",
+                    }
+
+                # Filter out the memories that match the memory_ids
+                existing_memories[guild_id] = [
+                    mem
+                    for mem in existing_memories[guild_id]
+                    if mem.get("memory_id") not in memory_ids_to_delete
+                ]
+
+                # If the guild has no memories left, consider removing the guild entry
+                if not existing_memories[guild_id]:
+                    del existing_memories[guild_id]
+
+                # Save updated memories
+                with open(memories_path, "w") as f:
+                    json.dump(existing_memories, f, indent=4)
+
+                return {"status": "memories deleted"}
+
             case _:
                 return {"status": "unknown event"}
 
@@ -155,6 +224,16 @@ def create_app(bot: commands.Bot):
         for guild in bot.guilds:
             guilds.append({"id": guild.id, "name": guild.name, "icon": guild.icon.key})
         return JSONResponse(guilds)
+
+    @app.get("/bot-details")
+    def bot_details():
+        return JSONResponse(
+            {
+                "bot_name": bot.user.name,
+                "bot_id": bot.user.id,
+                "bot_avatar_url": bot.user.avatar.url,
+            }
+        )
 
     return app
 
