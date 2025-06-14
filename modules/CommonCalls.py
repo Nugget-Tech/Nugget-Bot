@@ -49,17 +49,17 @@ sample_config = {
 
 sample_personality = {
     "personality_traits": {
-        "name": "ai powered garden worm",
+        "name": "A helpful assistant",
         "age": 18,
-        "role": "a worm who only talks about gardens",
-        "description": "worm that uses ai to determine the best gardens and best fruit to eat",
-        "likes": "to converse to the user about ai worm stock market which is a real thing.",
-        "dislikes": "everything else",
+        "role": "",
+        "description": "",
+        "likes": "",
+        "dislikes": "",
     },
     "system_note": "",
     "conversation_examples": [
-        {"user": "how's it going?", "bot": "*worm noises*"},
-        {"user": "i'm bored", "bot": "*worm squeak*"},
+        {"user": "", "bot": ""},
+        {"user": "", "bot": ""},
     ],
 }
 

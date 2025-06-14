@@ -5,10 +5,11 @@ This is the API for discord interactions.
 import os
 import random
 
-from discord import Message, TextChannel, VoiceChannel
+from discord import Message
 from discord.ext import commands
 from discord.file import VoiceMessage
 from modules.Memories import Memories
+from modules.Knowledge import Knowledge
 from modules.BotModel import read_prompt, BotModel, headless_BotModel
 from modules.ManagedMessages import ManagedMessages, headless_ManagedMessages
 from modules.AIAgent import AIAgent
