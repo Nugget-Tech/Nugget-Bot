@@ -226,7 +226,8 @@ def create_app(bot: commands.Bot):
                 {
                     "id": guild.id,
                     "name": guild.name,
-                    "icon": guild.icon.key or "https://",
+                    "icon": guild.icon.key
+                    or "",  # TODO add default value (if youre feeling good perhaps you can even make the icon)
                 }
             )
         return JSONResponse(guilds)
