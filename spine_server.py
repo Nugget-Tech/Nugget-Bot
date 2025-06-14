@@ -222,7 +222,13 @@ def create_app(bot: commands.Bot):
     def guilds_ret():
         guilds = []
         for guild in bot.guilds:
-            guilds.append({"id": guild.id, "name": guild.name, "icon": guild.icon.key})
+            guilds.append(
+                {
+                    "id": guild.id,
+                    "name": guild.name,
+                    "icon": guild.icon.key or "https://",
+                }
+            )
         return JSONResponse(guilds)
 
     @app.get("/bot-details")
