@@ -227,13 +227,7 @@ def create_app(bot: commands.Bot):
 
     @app.get("/bot-details")
     def bot_details():
-        return JSONResponse(
-            {
-                "bot_name": bot.user.name,
-                "bot_id": bot.user.id,
-                "bot_avatar_url": bot.user.avatar.url,
-            }
-        )
+        return JSONResponse({"bot_name": bot.user.name, "bot_id": bot.user.id})
 
     return app
 
