@@ -35,16 +35,17 @@ sample_config = {
     "error_message": "Nuh uh, not gonna happen.",
     "activate_message": "Hey! I'm new here :wave:",
     "deactivate_message": "Awh, sorry to see you go! You can still talk to me by pinging me :pleading_face:",
-    "vociceModel": "",
+    "voiceModel": "eleven_flash_v2_5",
     "recording-time": "10",
     "deepContext": "on",
     "freewill": "off",
     "textFrequency": "0",
     "keywordChance": "0",
     "keywords": [],
-    "voiceMessages": "on",
+    "voiceMessages": "off",
     "voiceMessageConvo": "on",
     "voiceChance": "100",
+    "debugMode": True,
 }
 
 sample_personality = {
@@ -122,7 +123,7 @@ class CommonCalls:
             "conversation_examples": conversation_examples,
         }
 
-    def config():
+    def config() -> dict:
         """
         Description:
         Loads and potentially updates the config file with environment variables

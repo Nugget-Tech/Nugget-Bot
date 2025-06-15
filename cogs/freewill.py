@@ -51,9 +51,23 @@ class Freewill(commands.Cog):
                     )
 
             if random.random() < min(text_frequency + keyword_added_chance, 1.0):
-                response = await Gemini.generate_response(
-                    message, await self.bot.get_context(message)
-                )
+                try:
+                    response = await Gemini.generate_response(
+                        message, await self.bot.get_context(message)
+                    )
+
+                except Exception as E:
+                    debug_mode = CommonCalls.config().get("debugMode")
+                    if debug_mode:
+                        return await message.reply(
+                            f"""{CommonCalls.config()["error_message"]}\nFault located @ freewill, error message @ L65.\nException:\n{E}\n
+                            -# Why did *I* get this? Learn more at <insert docs link>#debugMode
+                            """
+                        )
+                    else:
+                        return await message.reply(
+                            CommonCalls.config()["error_message"]
+                        )
 
                 if type(response) == tuple:
                     print("Voice mode on!")
@@ -86,14 +100,43 @@ class Freewill(commands.Cog):
                         print(f"Error replying response: {E}")
 
             if random.random() < min(reaction_frequency + keyword_added_chance, 1.0):
-                response = await Gemini.generate_response(message)
+                try:
+                    response = await Gemini.generate_response(
+                        message, await self.bot.get_context(message)
+                    )
+
+                except Exception as E:
+                    debug_mode = CommonCalls.config().get("debugMode")
+                    if debug_mode:
+                        return await message.reply(
+                            f"""{CommonCalls.config()["error_message"]}\nFault located @ freewill, error message @ L112.\nException:\n{E}\n
+                            -# Why did *I* get this? Learn more at <insert docs link>#debugMode
+                            """
+                        )
+                    else:
+                        return await message.reply(
+                            CommonCalls.config()["error_message"]
+                        )
 
                 async with message.channel.typing():
                     await asyncio.sleep(2)  # artificial delay lol
 
-                await ctx.reply(
-                    response, mention_author=False, allowed_mentions=allowed_mentions
-                )
+                chunks = [response[i : i + 2000] for i in range(0, len(response), 2000)]
+
+                for chunk in chunks:
+                    try:
+                        text = await message.reply(
+                            chunk,
+                            mention_author=False,
+                            allowed_mentions=allowed_mentions,
+                        )
+                        await ManagedMessages.add_to_message_list(
+                            channel_id=ctx.channel.id,
+                            message_id=text.id,
+                            message=f"{CommonCalls.load_character_details()['name']}: {text.content}",
+                        )
+                    except Exception as E:
+                        print(f"Error replying response: {E}")
 
 
 def setup(bot: commands.Bot):

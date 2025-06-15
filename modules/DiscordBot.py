@@ -57,6 +57,19 @@ class Gemini:
             guild_id, channel_id, message.content
         )
 
+        if isinstance(remembered_memories, list):
+            _fix_memory = remembered_memories
+            print("This is a list, DEBUG:")
+            print("remembered_memories = list")
+            print("index 0 of remembered_memories: ", remembered_memories[0])
+            print("correcting type to dict. slashing any value after the first index")
+            remembered_memories = _fix_memory[0]
+            print("corrected remembered:", remembered_memories)
+            print("type of: ", type(remembered_memories))
+
+        print("Remembered Memories:", remembered_memories)
+        print("Remembered Memories type:", type(remembered_memories))
+
         if remembered_memories["is_similar"]:
             prompt = read_prompt(
                 message,
@@ -86,6 +99,7 @@ class Gemini:
 
             file = await BotModel.upload_attachment(save_name)
             response = await BotModel.generate_content(prompt, channel_id, file)
+
             if voice_response:
                 print("Voice mode triggered by random_chance")
                 file_name = await VoiceMessages.record_with_elevenlabs(
@@ -198,12 +212,34 @@ class Gemini:
             response = await BotModel.generate_content(
                 prompt, channel_id
             )  # DISCORDBOT.PY
+
+            if (
+                config["voiceMessages"] == "on" and config["voiceMessageConvo"] == "on"
+            ):  # TODO change the name of that
+                # this means the global setting voice messages is on and the user would like to do voice message to voice message
+                # so lets implement this now, lets first start off by generalizing voice call.py
+                file_name = await VoiceMessages.record_with_elevenlabs(
+                    text=response, save_file=f"tts_rsp_{message_id}.mp3"
+                )
+
+                duration, waveform = AudioUtils.get_audio_metadata(file_name)
+                return (
+                    response,
+                    VoiceMessage(
+                        fp=file_name,
+                        duration_secs=duration,
+                        waveform=waveform,
+                    ),
+                )
             return response
 
 
 class headless_Gemini:
 
     async def generate_response(guild_id, channel_id, author_name, author_content):
+
+        if author_content in []:
+            pass
 
         if channel_id not in context_window:
             context_window[channel_id] = (
@@ -217,6 +253,11 @@ class headless_Gemini:
         remembered_memories = await memories.compare_memories(
             guild_id, channel_id, author_content
         )
+
+        if isinstance(remembered_memories, list):
+            remembered_memories = remembered_memories[
+                0
+            ]  # this is to fix the issue of remembered memories returning a list instead of a dictionary
 
         if remembered_memories["is_similar"]:
             prompt = read_prompt(

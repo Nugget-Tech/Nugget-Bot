@@ -33,7 +33,7 @@ class DevCommands(commands.Cog, name="Developer Commands"):
             self.bot.load_extension(cog)  # Loads the cog
             ctx.send(f"Reloaded `{cog}`")  # Sends a message where content='Done'
 
-    @commands.command(name="unload", aliases=["ul"])
+    @commands.command(name="unload")
     async def unload(self, ctx, cog):
         """
         Unload a cog.
@@ -47,7 +47,7 @@ class DevCommands(commands.Cog, name="Developer Commands"):
         await self.bot.unload_extension(cog)
         await ctx.send(f"`{cog}` has successfully been unloaded.")
 
-    @commands.command(name="load", aliases=["l"])
+    @commands.command(name="load")
     async def load(self, ctx, cog):
         """
         Loads a cog.
@@ -60,7 +60,7 @@ class DevCommands(commands.Cog, name="Developer Commands"):
         except commands.errors.ExtensionNotFound:
             await ctx.send(f"`{cog}` does not exist!")
 
-    @commands.command(name="listcogs", aliases=["lc"])
+    @commands.command(name="listcogs")
     async def listcogs(self, ctx):
         """
         Returns a list of all enabled commands.

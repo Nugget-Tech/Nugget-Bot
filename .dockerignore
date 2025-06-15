@@ -8,3 +8,4 @@ LICENSE
 README.md
 .gitignore
 bot_audio/*
+*.png

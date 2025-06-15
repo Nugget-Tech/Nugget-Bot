@@ -7,3 +7,9 @@ prompted.txt
 *.opus
 
 *.old
+*.new
+
+bot_audio/*
+
+*.png
+*.jpg

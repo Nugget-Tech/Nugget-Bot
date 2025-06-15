@@ -10,7 +10,13 @@ from modules.ManagedMessages import ManagedMessages
 intents = Intents.default()
 intents.members = True
 intents.message_content = True
-bot = commands.Bot(command_prefix="!", intents=intents)
+
+
+def get_prefix(bot, message):
+    return commands.when_mentioned(bot, message)
+
+
+bot = commands.Bot(command_prefix=get_prefix, intents=intents)
 
 mem_path = f"data/{CommonCalls.config()['alias']}-memories.json"
 act_path = f"data/{CommonCalls.config()['alias']}-activation.json"
@@ -39,9 +45,12 @@ async def load_cogs():
 
 @bot.command()
 async def test(ctx):
-    await ctx.reply(
-        f"context_window = {ManagedMessages.context_window}\n managed_messages = {ManagedMessages.managed_messages}"
-    )
+    command_list = []
+    prefix = get_prefix(bot, message=ctx.message)
+    for cmd in bot.commands:
+        names = [prefix + cmd.name] + [prefix + alias for alias in cmd.aliases]
+        command_list.append(names)
+    return await ctx.send(command_list)
 
 
 def start_api():
