@@ -7,9 +7,10 @@ from discord.ext import commands
 from modules.DiscordBot import Gemini
 from modules.ManagedMessages import ManagedMessages
 from modules.CommonCalls import CommonCalls
+from typing import List, Any
 
 allowed_mentions = AllowedMentions(everyone=False, users=False, roles=False)
-activation_path = f"data/{CommonCalls.config()['alias']}-activation.json"
+activation_path = f"data/{CommonCalls.config().get('alias')}-activation.json"
 
 
 class Freewill(commands.Cog):
@@ -27,11 +28,14 @@ class Freewill(commands.Cog):
 
     @commands.Cog.listener("on_message")
     async def freewill(self, message: Message) -> None:
-        if CommonCalls.config()["freewill"] == "on":  # TODO implement
+        if CommonCalls.config().get("freewill") == "on":  # TODO implement
 
             ctx = await self.bot.get_context(message)
 
-            if message.author.id == self.bot.user.id:
+            if ctx.valid:
+                return
+
+            if ctx.message.author.id == self.bot.user.id:
                 return
 
             if self.bot.user.mentioned_in(message) or self.is_activated(ctx.channel.id):
@@ -47,7 +51,7 @@ class Freewill(commands.Cog):
             for i in keywords:
                 if i.lower() in message.content.lower():
                     keyword_added_chance = (
-                        float(CommonCalls.config()["keywordChance"]) * 0.01
+                        float(CommonCalls.config().get("keywordChance")) * 0.01
                     )
 
             if random.random() < min(text_frequency + keyword_added_chance, 1.0):
@@ -60,13 +64,15 @@ class Freewill(commands.Cog):
                     debug_mode = CommonCalls.config().get("debugMode")
                     if debug_mode:
                         return await message.reply(
-                            f"""{CommonCalls.config()["error_message"]}\nFault located @ freewill, error message @ L65.\nException:\n{E}\n
+                            f"""{CommonCalls.config().get("error_message")}\nFault located @ freewill, error message @ L65.\nException:\n{E}\n
                             -# Why did *I* get this? Learn more at <insert docs link>#debugMode
                             """
                         )
                     else:
                         return await message.reply(
-                            CommonCalls.config()["error_message"]
+                            CommonCalls.config().get(
+                                ["error_message"],
+                            )
                         )
 
                 if type(response) == tuple:
@@ -109,13 +115,13 @@ class Freewill(commands.Cog):
                     debug_mode = CommonCalls.config().get("debugMode")
                     if debug_mode:
                         return await message.reply(
-                            f"""{CommonCalls.config()["error_message"]}\nFault located @ freewill, error message @ L112.\nException:\n{E}\n
+                            f"""{CommonCalls.config().get("error_message")}\nFault located @ freewill, error message @ L112.\nException:\n{E}\n
                             -# Why did *I* get this? Learn more at <insert docs link>#debugMode
                             """
                         )
                     else:
                         return await message.reply(
-                            CommonCalls.config()["error_message"]
+                            CommonCalls.config().get("error_message")
                         )
 
                 async with message.channel.typing():

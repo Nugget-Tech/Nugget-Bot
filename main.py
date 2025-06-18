@@ -18,8 +18,8 @@ def get_prefix(bot, message):
 
 bot = commands.Bot(command_prefix=get_prefix, intents=intents)
 
-mem_path = f"data/{CommonCalls.config()['alias']}-memories.json"
-act_path = f"data/{CommonCalls.config()['alias']}-activation.json"
+mem_path = f"""data/{CommonCalls.config().get('alias')}-memories.json"""
+act_path = f"""data/{CommonCalls.config().get('alias')}-activation.json"""
 
 
 @bot.listen("on_ready", once=True)
@@ -65,4 +65,4 @@ if __name__ == "__main__":
     t.start()
 
     # 2) start your Discord bot (blocks, uses its own loop)
-    bot.run(CommonCalls.config()["discord_token"])
+    bot.run(CommonCalls.config().get("discord_token"))

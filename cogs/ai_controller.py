@@ -7,7 +7,7 @@ from modules.ManagedMessages import ManagedMessages
 from modules.Memories import Memories
 from modules.CommonCalls import CommonCalls
 
-activation_path = f"data/{CommonCalls.config()['alias']}-activation.json"
+activation_path = f"data/{CommonCalls.config().get('alias')}-activation.json"
 
 
 class AIController(commands.Cog, name="AI-Controller"):
@@ -32,7 +32,7 @@ class AIController(commands.Cog, name="AI-Controller"):
             json.dump(activated_channels, unloaded_activated_channel)
 
             activated_string = (
-                CommonCalls.config()["activate_message"]
+                CommonCalls.config().get("activate_message")
                 or f"{self.bot.user.name} is activated in <#{ctx.channel.id}>"
             )
             await ctx.reply(activated_string, mention_author=False)
@@ -48,7 +48,7 @@ class AIController(commands.Cog, name="AI-Controller"):
             json.dump(activated_channels, unloaded_activated_channel)
 
             activated_string = (
-                CommonCalls.config()["deactivate_message"]
+                CommonCalls.config().get("deactivate_message")
                 or f"{self.bot.user.name} has deactivated in <#{ctx.channel.id}>"
             )
             await ctx.reply(activated_string, mention_author=False)

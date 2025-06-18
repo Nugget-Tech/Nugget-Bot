@@ -61,7 +61,7 @@ class AIAgent:
                 safety_settings=[
                     SafetySetting(
                         category="HARM_CATEGORY_HATE_SPEECH",
-                        threshold=CommonCalls.config()["filterHateSpeech"],
+                        threshold=CommonCalls.config().get("filterHateSpeech"),
                     ),
                     SafetySetting(
                         category="HARM_CATEGORY_HARASSMENT",

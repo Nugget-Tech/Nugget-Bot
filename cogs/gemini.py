@@ -32,8 +32,12 @@ class GeminiCog(commands.Cog):
     @commands.Cog.listener("on_message")
     async def listen(self, message: Message):
         channel_id = message.channel.id
+        ctx = await self.bot.get_context(message)
 
         if message.author.id == self.bot.user.id:
+            return
+
+        if ctx.valid:
             return
 
         if self.bot.user.mentioned_in(message) or self.is_activated(channel_id):
@@ -97,15 +101,6 @@ class GeminiCog(commands.Cog):
                     channel_id, reaction.message.id
                 )
                 print(f"Removed message ID ({reaction.message.id}) from STM")
-
-            # case "⭐":
-            #     await ManagedMessages.save_message_to_db(message_content=reaction.message.content, message_id=reaction.message.id, jump_url=reaction.message.jump_url)
-            #     print("Saved message to `bot_db`")
-
-            case "🗑️":
-                await ManagedMessages.remove_message_from_db(
-                    message_id=reaction.message.id
-                )
 
             case _:
 
