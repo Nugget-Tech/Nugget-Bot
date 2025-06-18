@@ -33,7 +33,6 @@ class Freewill(commands.Cog):
             ctx = await self.bot.get_context(message)
 
             if ctx.valid:
-                print("This is valid and ignored")
                 return
 
             if ctx.message.author.id == self.bot.user.id:
@@ -63,7 +62,7 @@ class Freewill(commands.Cog):
 
                 except Exception as E:
                     debug_mode = CommonCalls.config().get("debugMode")
-                    if debug_mode:
+                    if debug_mode == "on":
                         return await message.reply(
                             f"""{CommonCalls.config().get("error_message")}\nFault located @ freewill, error message @ L65.\nException:\n{E}\n
                             -# Why did *I* get this? Learn more at <insert docs link>#debugMode
@@ -114,7 +113,7 @@ class Freewill(commands.Cog):
 
                 except Exception as E:
                     debug_mode = CommonCalls.config().get("debugMode")
-                    if debug_mode:
+                    if debug_mode == "on":
                         return await message.reply(
                             f"""{CommonCalls.config().get("error_message")}\nFault located @ freewill, error message @ L112.\nException:\n{E}\n
                             -# Why did *I* get this? Learn more at <insert docs link>#debugMode

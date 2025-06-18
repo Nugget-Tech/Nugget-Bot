@@ -12,6 +12,7 @@ Optimization 2:
 
 import json
 import os
+import re
 
 sample_config = {
     "alias": os.getenv("BOT_ID"),
@@ -45,7 +46,8 @@ sample_config = {
     "voiceMessages": "off",
     "voiceMessageConvo": "on",
     "voiceChance": "100",
-    "debugMode": True,
+    "JustGetRidOfTheName": "on",
+    "debugMode": "off",
 }
 
 sample_personality = {
@@ -193,8 +195,11 @@ class CommonCalls:
         Returns:
         nasty_json : dict
         """
-        print("type nasty", type(nasty_json))
         if nasty_json.startswith("```json") and nasty_json.endswith("```"):
             return json.loads(nasty_json[7:-3])
         else:
             return json.loads(nasty_json)  # Assumed to be clean.. lol
+
+    def remove_multiple_name_prefixes(name, text):
+        # Removes all leading occurrences of "name:" (case-insensitive), including whitespace in between
+        return re.sub(r"^(?:\s*{}:\s*)+".format(name), "", text, flags=re.IGNORECASE)

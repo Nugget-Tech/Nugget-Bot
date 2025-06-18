@@ -20,9 +20,11 @@ class GeminiCog(commands.Cog):
         try:
             with open(activation_path, "r") as ul_activation:
                 activated: dict = json.load(ul_activation)
-                print(
-                    "[BOT][INFO] | Activated channels function call `is_activated` (Message from line 24 @ cogs/gemini.py)"
-                )
+                debug_mode = CommonCalls.config().get("debugMode")
+                if debug_mode == "on":
+                    print(
+                        "[BOT][INFO] | Activated channels function call `is_activated` (Message from line 24 @ cogs/gemini.py)"
+                    )
                 return bool(activated.get(str(channel_id), False))
         except FileNotFoundError:
             with open(activation_path, "w") as E:
@@ -38,7 +40,6 @@ class GeminiCog(commands.Cog):
             return
 
         if ctx.valid:
-            print("This is valid and ignored")
             return
 
         if self.bot.user.mentioned_in(message) or self.is_activated(channel_id):
@@ -84,7 +85,7 @@ class GeminiCog(commands.Cog):
 
         except Exception as E:
             debug_mode = CommonCalls.config().get("debugMode")
-            if debug_mode:
+            if debug_mode == "on":
                 return await message.reply(
                     f"""{CommonCalls.config()["error_message"]}\nFault located in cogs/gemini @ L84 , error message @ L65.\nException:\n{E}\n-# Why did *I* get this? Learn more at <insert docs link>#debugMode"""
                 )
@@ -101,7 +102,9 @@ class GeminiCog(commands.Cog):
                 await ManagedMessages.remove_from_message_list(
                     channel_id, reaction.message.id
                 )
-                print(f"Removed message ID ({reaction.message.id}) from STM")
+                debug_mode = CommonCalls.config().get("debugMode")
+                if debug_mode == "on":
+                    print(f"Removed message ID ({reaction.message.id}) from STM")
 
             case _:
 

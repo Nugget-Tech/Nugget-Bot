@@ -109,7 +109,6 @@ class AIAgent:
         N/A
         """
         try:
-            print(type(ai_function), ai_function)
             category = ai_function["category"]
             match category:
 
@@ -133,7 +132,9 @@ class AIAgent:
                     # )
                     # END EXAMPLE
                 case _:
-                    print(ai_function)
+                    debug_mode = CommonCalls.config().get("debugMode")
+                    if debug_mode == "on":
+                        print(ai_function)
 
         except KeyError:
             return print("BAD")

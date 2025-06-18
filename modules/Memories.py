@@ -73,9 +73,11 @@ class Memories:
                 return ""
 
     async def save_to_memory(self, message: Message, force=False):
-        print(
-            "Save to memory function call `Memories.save_to_memory` (Message from line 98 @ modules/Memories.py)"
-        )
+        debug_mode = CommonCalls.config().get("debugMode")
+        if debug_mode == "on":
+            print(
+                "Save to memory function call `Memories.save_to_memory` (Message from line 98 @ modules/Memories.py)"
+            )
         _channel_id = message.channel.id
         guild_id = message.guild.id
         key = str(guild_id)  # Ensure key consistency
@@ -95,9 +97,11 @@ class Memories:
                 )
             )["special_phrase"]
             if special_phrase == None or special_phrase == "":
-                print(
-                    f"[Warning] modules/Memories.py `save_to_memory` force_level = {force}. Special phrase is none. a uuid is being assigned."
-                )
+                debug_mode = CommonCalls.config().get("debugMode")
+                if debug_mode == "on":
+                    print(
+                        f"[Warning] modules/Memories.py `save_to_memory` force_level = {force}. Special phrase is none. a uuid is being assigned."
+                    )
 
                 memory_entry = {
                     "memory_id": str(uuid4()),
@@ -126,22 +130,30 @@ class Memories:
     def fetch_and_sort_entries(self, guild_id):
         # Load the current memories from the JSON file
         memories = self.load_memories()
-        print("fetch n sort pre sort: ", memories.keys())
+        debug_mode = CommonCalls.config().get("debugMode")
+        if debug_mode == "on":
+            print("fetch n sort pre sort: ", memories.keys())
         key = str(guild_id)  # Ensure key consistency
 
         # Get the memories for the specific channel, sorted by timestamp
         sorted_memories = sorted(memories.get(key, []), key=lambda x: x["timestamp"])
-        print("fetch n sort post sort: ", memories.keys())
+        debug_mode = CommonCalls.config().get("debugMode")
+        if debug_mode == "on":
+            print("fetch n sort post sort: ", memories.keys())
 
         # Create a dictionary with special_phrase as the key and memory as the value
         result = {entry["special_phrase"]: entry["memory"] for entry in sorted_memories}
-        print("fetch n sort emitted result: ", result)
+        debug_mode = CommonCalls.config().get("debugMode")
+        if debug_mode == "on":
+            print("fetch n sort emitted result: ", result)
         return result
 
     async def is_worth_remembering(self, context):
-        print(
-            "Worth Remembering function call `Memories.is_worth_remembering` (Message from line 131 @ modules/Memories.py)"
-        )
+        debug_mode = CommonCalls.config().get("debugMode")
+        if debug_mode == "on":
+            print(
+                "Worth Remembering function call `Memories.is_worth_remembering` (Message from line 131 @ modules/Memories.py)"
+            )
         system_instruction = """
 Objective:
 Determine whether a conversation is worth remembering based on predefined criteria and if it is, provide a highly detailed phrase summarizing the entire conversation that you'd remember.
@@ -201,11 +213,16 @@ Provide your response in a JSON format {"is_worth" : true/false, "special_phrase
             print(E)
 
     async def compare_memories(self, guild_id, channel_id, message):
-        print(
-            "Compare Memories function call `Memories.compare_memories` (Message from line 202 @ modules/Memories.py)"
-        )
+        debug_mode = CommonCalls.config().get("debugMode")
+        if debug_mode == "on":
+            print(
+                "Compare Memories function call `Memories.compare_memories` (Message from line 202 @ modules/Memories.py)"
+            )
         entries = self.fetch_and_sort_entries(guild_id).keys()
-        print("This is entries from compare memories in modules/memories.py", entries)
+        if debug_mode == "on":
+            print(
+                "This is entries from compare memories in modules/memories.py", entries
+            )
         system_instruction = """
 Objective:
 Determine if the provided context or phrase is similar to another given phrase or message based on predefined criteria.

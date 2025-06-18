@@ -59,16 +59,20 @@ class Gemini:
 
         if isinstance(remembered_memories, list):
             _fix_memory = remembered_memories
-            print("This is a list, DEBUG:")
-            print("remembered_memories = list")
-            print("index 0 of remembered_memories: ", remembered_memories[0])
-            print("correcting type to dict. slashing any value after the first index")
+            debug_mode = CommonCalls.config().get("debugMode")
             remembered_memories = _fix_memory[0]
-            print("corrected remembered:", remembered_memories)
-            print("type of: ", type(remembered_memories))
+            if debug_mode == "on":
+                print("This is a list, DEBUG:")
+                print("remembered_memories = list")
+                print("index 0 of remembered_memories: ", remembered_memories[0])
+                print(
+                    "correcting type to dict. slashing any value after the first index"
+                )
+                print("corrected remembered:", remembered_memories)
+                print("type of: ", type(remembered_memories))
 
-        print("Remembered Memories:", remembered_memories)
-        print("Remembered Memories type:", type(remembered_memories))
+                print("Remembered Memories:", remembered_memories)
+                print("Remembered Memories type:", type(remembered_memories))
 
         if remembered_memories["is_similar"]:
             prompt = read_prompt(
@@ -99,6 +103,11 @@ class Gemini:
 
             file = await BotModel.upload_attachment(save_name)
             response = await BotModel.generate_content(prompt, channel_id, file)
+
+            if CommonCalls.config()["JustGetRidOfTheName"] == "on":
+                response = CommonCalls.remove_multiple_name_prefixes(
+                    name=CommonCalls.load_character_details()["name"], text=response
+                )
 
             if voice_response:
                 print("Voice mode triggered by random_chance")
@@ -142,6 +151,12 @@ class Gemini:
             response = await BotModel.generate_content(
                 prompt=prompt, channel_id=channel_id, attachment=file
             )
+
+            if CommonCalls.config()["JustGetRidOfTheName"] == "on":
+                response = CommonCalls.remove_multiple_name_prefixes(
+                    name=CommonCalls.load_character_details()["name"], text=response
+                )
+
             if voice_response:
                 print("Voice mode triggered by random_chance")
                 file_name = await VoiceMessages.record_with_elevenlabs(
@@ -181,6 +196,11 @@ class Gemini:
                 prompt=prompt, channel_id=channel_id
             )
 
+            if CommonCalls.config()["JustGetRidOfTheName"] == "on":
+                response = CommonCalls.remove_multiple_name_prefixes(
+                    name=CommonCalls.load_character_details()["name"], text=response
+                )
+
             if (
                 config["voiceMessages"] == "on" and config["voiceMessageConvo"] == "on"
             ):  # TODO change the name of that
@@ -212,6 +232,11 @@ class Gemini:
             response = await BotModel.generate_content(
                 prompt, channel_id
             )  # DISCORDBOT.PY
+
+            if CommonCalls.config()["JustGetRidOfTheName"] == "on":
+                response = CommonCalls.remove_multiple_name_prefixes(
+                    name=CommonCalls.load_character_details()["name"], text=response
+                )
 
             if (
                 config["voiceMessages"] == "on" and config["voiceMessageConvo"] == "on"
