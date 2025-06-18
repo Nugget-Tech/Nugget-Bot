@@ -38,6 +38,7 @@ class GeminiCog(commands.Cog):
             return
 
         if ctx.valid:
+            print("This is valid and ignored")
             return
 
         if self.bot.user.mentioned_in(message) or self.is_activated(channel_id):

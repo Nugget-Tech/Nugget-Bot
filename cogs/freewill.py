@@ -33,6 +33,7 @@ class Freewill(commands.Cog):
             ctx = await self.bot.get_context(message)
 
             if ctx.valid:
+                print("This is valid and ignored")
                 return
 
             if ctx.message.author.id == self.bot.user.id:
