@@ -6,6 +6,8 @@ prompted.txt
 *.ogg
 *.opus
 
+*.mp4
+
 *.old
 *.new
 

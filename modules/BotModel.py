@@ -212,7 +212,7 @@ class BotModel:
                 )
                 await asyncio.sleep(2)
                 attachment_media = client.files.get(
-                    attachment_media.name
+                    name=attachment_media.name
                 )  # Update the state
             elif attachment_media.state.name == "ACTIVE":
                 print(
