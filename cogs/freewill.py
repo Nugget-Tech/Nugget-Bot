@@ -66,18 +66,20 @@ class Freewill(commands.Cog):
                         return await message.reply(
                             f"""{CommonCalls.config().get("error_message")}\nFault located @ freewill, error message @ L65.\nException:\n{E}\n
                             -# Why did *I* get this? Learn more at <insert docs link>#debugMode
-                            """
+                            """,
+                            mention_author=False,
                         )
                     else:
                         return await message.reply(
                             CommonCalls.config().get(
                                 ["error_message"],
-                            )
+                            ),
+                            mention_author=False,
                         )
 
                 if type(response) == tuple:
                     print("Voice mode on!")
-                    text = await message.reply(file=response[1])
+                    text = await message.reply(file=response[1], mention_author=False)
                     await ManagedMessages.add_to_message_list(
                         channel_id=ctx.channel.id,
                         message_id=text.id,
@@ -96,6 +98,7 @@ class Freewill(commands.Cog):
                             chunk,
                             mention_author=False,
                             allowed_mentions=allowed_mentions,
+                            mention_author=False,
                         )
                         await ManagedMessages.add_to_message_list(
                             channel_id=ctx.channel.id,
@@ -117,11 +120,13 @@ class Freewill(commands.Cog):
                         return await message.reply(
                             f"""{CommonCalls.config().get("error_message")}\nFault located @ freewill, error message @ L112.\nException:\n{E}\n
                             -# Why did *I* get this? Learn more at <insert docs link>#debugMode
-                            """
+                            """,
+                            mention_author=False,
                         )
                     else:
                         return await message.reply(
-                            CommonCalls.config().get("error_message")
+                            CommonCalls.config().get("error_message"),
+                            mention_author=False,
                         )
 
                 async with message.channel.typing():
@@ -135,6 +140,7 @@ class Freewill(commands.Cog):
                             chunk,
                             mention_author=False,
                             allowed_mentions=allowed_mentions,
+                            mention_author=False,
                         )
                         await ManagedMessages.add_to_message_list(
                             channel_id=ctx.channel.id,

@@ -62,11 +62,14 @@ class GeminiCog(commands.Cog):
                     channel_id=channel_id,
                     message_id=text.id,
                     message=f"{CommonCalls.load_character_details()['name']}: {response[0]}",
+                    mention_author=False,
                 )
                 return
 
             if response == "[]":
-                return await message.reply(CommonCalls.config()["error_message"])
+                return await message.reply(
+                    CommonCalls.config()["error_message"], mention_author=False
+                )
 
             chunks = [response[i : i + 2000] for i in range(0, len(response), 2000)]
 
@@ -79,6 +82,7 @@ class GeminiCog(commands.Cog):
                         channel_id=channel_id,
                         message_id=text.id,
                         message=f"{CommonCalls.load_character_details()['name']}: {text.content}",
+                        mention_author=False,
                     )
                 except Exception as E:
                     print(f"Error replying response: {E}")
@@ -87,10 +91,13 @@ class GeminiCog(commands.Cog):
             debug_mode = CommonCalls.config().get("debugMode")
             if debug_mode == "on":
                 return await message.reply(
-                    f"""{CommonCalls.config()["error_message"]}\nFault located in cogs/gemini @ L84 , error message @ L65.\nException:\n{E}\n-# Why did *I* get this? Learn more at <insert docs link>#debugMode"""
+                    f"""{CommonCalls.config()["error_message"]}\nFault located in cogs/gemini @ L84 , error message @ L65.\nException:\n{E}\n-# Why did *I* get this? Learn more at <insert docs link>#debugMode""",
+                    mention_author=False,
                 )
             else:
-                return await message.reply(CommonCalls.config()["error_message"])
+                return await message.reply(
+                    CommonCalls.config()["error_message"], mention_author=False
+                )
 
     @commands.Cog.listener("on_reaction_add")
     async def on_rxn_add(self, reaction: Reaction, user: Member):

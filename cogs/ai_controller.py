@@ -19,7 +19,10 @@ class AIController(commands.Cog, name="AI-Controller"):
     @commands.command()
     async def wack(self, ctx: Context):
         """Clears the bot's context window, resetting the conversation"""
-        await ctx.reply(await ManagedMessages.remove_channel_from_list(ctx.channel.id))
+        await ctx.reply(
+            await ManagedMessages.remove_channel_from_list(ctx.channel.id),
+            mention_author=False,
+        )
 
     @commands.command()
     async def activate(self, ctx: Context):
@@ -57,7 +60,9 @@ class AIController(commands.Cog, name="AI-Controller"):
     async def remember(self, ctx: Context):
         """Forcefully calls the save_to_memory function [MAY NOT WORK AS EXPECTED]"""
         await Memories().save_to_memory(message=ctx.message, force=True)
-        await ctx.reply("force remembered ._.")
+        await ctx.reply(
+            "force remembered ._.", mention_author=False
+        )  # TODO: Add personalization for this one, also let it send the memory ID
 
 
 def setup(bot: commands.Bot):

@@ -104,7 +104,9 @@ class VoiceCalls:
         voice: discord.Member.voice = ctx.author.voice
 
         if not voice:
-            await ctx.send("You aren't in a voice channel!")
+            await ctx.send(
+                "You aren't in a voice channel!"
+            )  # Todo, add personalizaiton
             return
 
         # Check if we already have a connection for this guild
@@ -116,7 +118,7 @@ class VoiceCalls:
             except discord.ClientException:
                 await ctx.send(
                     "I couldn't connect to the voice channel. Please check my permissions."
-                )
+                )  # TODO, add personalizaiton
                 return
             connections[ctx.guild.id] = vc
 

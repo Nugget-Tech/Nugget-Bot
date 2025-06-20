@@ -43,16 +43,6 @@ async def load_cogs():
             file.close()
 
 
-@bot.command()
-async def test(ctx):
-    command_list = []
-    prefix = get_prefix(bot, message=ctx.message)
-    for cmd in bot.commands:
-        names = [prefix + cmd.name] + [prefix + alias for alias in cmd.aliases]
-        command_list.append(names)
-    return await ctx.send(command_list)
-
-
 def start_api():
     app = create_app(bot)
     # uvicorn.run will create and manage its own event loop
